@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KosTrack - Monitoring Keuangan Anak Kos</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0f172a;--card:#172033;--card2:#1e293b;--text:#e5e7eb;--muted:#94a3b8;--cyan:#22d3ee;--green:#34d399;--red:#fb7185;--yellow:#fbbf24;--border:#263449}
+body{font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+button,input,select{font:inherit}
+button{cursor:pointer;border:0}
+.app{display:flex;min-height:100vh}
+.sidebar{width:245px;background:#0b1220;border-right:1px solid var(--border);padding:22px 15px;position:fixed;left:0;top:0;bottom:0}
+.logo{font-size:24px;font-weight:800;color:var(--cyan);padding:10px 12px 25px}
+.logo span{color:white}
+.nav button{display:block;width:100%;background:transparent;color:var(--muted);padding:13px 14px;text-align:left;border-radius:10px;margin:4px 0}
+.nav button:hover,.nav button.active{background:#162238;color:white}
+.main{margin-left:245px;width:calc(100% - 245px);padding:25px;max-width:1500px}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px}
+.topbar h1{font-size:26px}
+.profile{background:var(--card);padding:9px 14px;border-radius:10px;color:var(--muted)}
+.page{display:none}.page.active{display:block}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:18px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px}
+.card .label{color:var(--muted);font-size:13px;margin-bottom:10px}
+.card .value{font-size:24px;font-weight:750}
+.green{color:var(--green)}.red{color:var(--red)}.yellow{color:var(--yellow)}.cyan{color:var(--cyan)}
+.grid2{display:grid;grid-template-columns:1.35fr 1fr;gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.section{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:18px}
+.section-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.section-title h2{font-size:17px}
+.btn{padding:10px 14px;border-radius:9px;background:var(--cyan);color:#082f3a;font-weight:700}
+.btn.secondary{background:var(--card2);color:var(--text);border:1px solid var(--border)}
+.btn.danger{background:#4a1825;color:#fecdd3}
+.btn.small{padding:7px 10px;font-size:12px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+form{display:grid;gap:12px}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.field label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}
+.field input,.field select{width:100%;padding:11px;border:1px solid var(--border);background:#0e1727;color:white;border-radius:9px;outline:none}
+.field input:focus,.field select:focus{border-color:var(--cyan)}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:12px 9px;border-bottom:1px solid var(--border);font-size:13px}
+th{color:var(--muted);font-weight:600}
+.badge{display:inline-block;padding:5px 8px;border-radius:20px;font-size:11px}
+.badge.food{background:#3b2413;color:#fdba74}.badge.transport{background:#172e42;color:#7dd3fc}.badge.bill{background:#312047;color:#d8b4fe}.badge.other{background:#253329;color:#86efac}.badge.ent{background:#3a2631;color:#f9a8d4}
+.progress{height:9px;background:#0d1625;border-radius:20px;overflow:hidden;margin:8px 0}
+.progress div{height:100%;border-radius:20px;background:var(--cyan)}
+.progress.redbar div{background:var(--red)}
+.muted{color:var(--muted)}
+.alert{padding:14px;border-radius:10px;margin-bottom:10px;background:#332914;border:1px solid #5b4615;color:#fde68a}
+.alert.good{background:#103128;border-color:#145c48;color:#a7f3d0}
+.alert.bad{background:#351722;border-color:#6b2336;color:#fecdd3}
+.empty{text-align:center;color:var(--muted);padding:25px}
+.modal{position:fixed;inset:0;background:#0009;display:none;align-items:center;justify-content:center;padding:20px;z-index:20}
+.modal.show{display:flex}.modal-box{width:min(500px,100%);background:var(--card);border:1px solid var(--border);border-radius:15px;padding:22px}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.close{background:transparent;color:var(--muted);font-size:24px}
+.kpi{font-size:28px;font-weight:800;margin:5px 0}
+.tip{padding:14px;background:#12273a;border-left:3px solid var(--cyan);border-radius:8px;color:#bae6fd;line-height:1.5}
+#chartWrap{height:290px}
+canvas{max-height:290px}
+.filter{display:flex;gap:8px;margin-bottom:15px;flex-wrap:wrap}
+.filter input,.filter select{background:#0e1727;color:white;border:1px solid var(--border);padding:9px;border-radius:8px}
+@media(max-width:900px){.sidebar{width:70px}.logo{font-size:0}.logo:after{content:"K";font-size:25px}.nav button{font-size:0;text-align:center}.nav button:first-letter{font-size:18px}.main{margin-left:70px;width:calc(100% - 70px)}.cards{grid-template-columns:repeat(2,1fr)}.grid2,.grid3{grid-template-columns:1fr}}
+@media(max-width:600px){.main{padding:15px}.cards,.form-grid{grid-template-columns:1fr}.topbar{align-items:flex-start;gap:10px;flex-direction:column}.profile{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="logo">Kos<span>Track</span></div>
+  <nav class="nav">
+    <button class="active" onclick="showPage('dashboard',this)">🏠 Dashboard</button>
+    <button onclick="showPage('transactions',this)">💸 Transaksi</button>
+    <button onclick="showPage('budget',this)">🎯 Budget</button>
+    <button onclick="showPage('statistics',this)">📊 Statistik</button>
+    <button onclick="showPage('report',this)">📑 Laporan</button>
+  </nav>
+</aside>
+
+<main class="main">
+<header class="topbar">
+  <div><h1 id="pageTitle">Dashboard</h1><p class="muted">Pantau keuangan kos dengan lebih mudah.</p></div>
+  <div class="profile">👤 Anak Kos</div>
+</header>
+
+<section id="dashboard" class="page active">
+  <div class="cards">
+    <div class="card"><div class="label">Total Pemasukan</div><div id="income" class="value green">Rp0</div></div>
+    <div class="card"><div class="label">Total Pengeluaran</div><div id="expense" class="value red">Rp0</div></div>
+    <div class="card"><div class="label">Saldo Saat Ini</div><div id="balance" class="value cyan">Rp0</div></div>
+    <div class="card"><div class="label">Budget Harian</div><div id="dailyBudget" class="value yellow">Rp0</div></div>
+  </div>
+
+  <div id="alerts"></div>
+
+  <div class="grid2">
+    <div class="section">
+      <div class="section-title"><h2>Pengeluaran 7 Hari Terakhir</h2><button class="btn small" onclick="openModal('expense')">+ Pengeluaran</button></div>
+      <div id="chartWrap"><canvas id="weekChart"></canvas></div>
+    </div>
+    <div class="section">
+      <div class="section-title"><h2>Budget Bulanan</h2><button class="btn small" onclick="showPage('budget')">Atur Budget</button></div>
+      <div id="budgetSummary"></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="section">
+      <div class="section-title"><h2>Transaksi Terbaru</h2><button class="btn secondary small" onclick="showPage('transactions')">Lihat Semua</button></div>
+      <div id="recent"></div>
+    </div>
+    <div class="section">
+      <div class="section-title"><h2>💡 Tips Keuangan</h2></div>
+      <div id="tip" class="tip"></div>
+    </div>
+  </div>
+</section>
+
+<section id="transactions" class="page">
+  <div class="section">
+    <div class="section-title"><h2>Riwayat Transaksi</h2><div class="actions"><button class="btn small" onclick="openModal('income')">+ Pemasukan</button><button class="btn small" onclick="openModal('expense')">+ Pengeluaran</button></div></div>
+    <div class="filter">
+      <input id="search" placeholder="🔎 Cari transaksi..." oninput="renderTransactions()">
+      <select id="filterType" onchange="renderTransactions()"><option value="all">Semua</option><option value="income">Pemasukan</option><option value="expense">Pengeluaran</option></select>
+      <select id="filterCat" onchange="renderTransactions()"><option value="all">Semua Kategori</option><option>Makanan</option><option>Transportasi</option><option>Tagihan</option><option>Pendidikan</option><option>Belanja</option><option>Hiburan</option><option>Kesehatan</option><option>Kebutuhan Pribadi</option><option>Lainnya</option></select>
+    </div>
+    <div id="transactionTable"></div>
+  </div>
+</section>
+
+<section id="budget" class="page">
+  <div class="grid2">
+    <div class="section">
+      <div class="section-title"><h2>Budget Bulanan</h2><span class="muted">Bulan berjalan</span></div>
+      <form onsubmit="saveBudget(event)">
+        <div class="field"><label>Total budget bulanan</label><input id="budgetTotal" type="number" min="0" required></div>
+        <div class="form-grid">
+          <div class="field"><label>Makanan</label><input id="bMakanan" type="number" min="0"></div>
+          <div class="field"><label>Transportasi</label><input id="bTransportasi" type="number" min="0"></div>
+          <div class="field"><label>Tagihan</label><input id="bTagihan" type="number" min="0"></div>
+          <div class="field"><label>Pendidikan</label><input id="bPendidikan" type="number" min="0"></div>
+          <div class="field"><label>Belanja</label><input id="bBelanja" type="number" min="0"></div>
+          <div class="field"><label>Hiburan</label><input id="bHiburan" type="number" min="0"></div>
+          <div class="field"><label>Kesehatan</label><input id="bKesehatan" type="number" min="0"></div>
+          <div class="field"><label>Kebutuhan Pribadi</label><input id="bKebutuhan_Pribadi" type="number" min="0"></div>
+        </div>
+        <button class="btn">Simpan Budget</button>
+      </form>
+    </div>
+    <div class="section">
+      <div class="section-title"><h2>Budget Harian</h2></div>
+      <div class="kpi" id="budgetDayValue">Rp0</div>
+      <p class="muted">Batas aman berdasarkan saldo dan sisa hari bulan ini.</p>
+      <div id="dailyStatus" style="margin-top:20px"></div>
+    </div>
+  </div>
+  <div class="section"><div class="section-title"><h2>Progress Budget per Kategori</h2></div><div id="budgetDetails"></div></div>
+</section>
+
+<section id="statistics" class="page">
+  <div class="cards">
+    <div class="card"><div class="label">Rata-rata Pengeluaran/Hari</div><div id="avgExpense" class="value red">Rp0</div></div>
+    <div class="card"><div class="label">Kategori Terbesar</div><div id="topCategory" class="value cyan">-</div></div>
+    <div class="card"><div class="label">Jumlah Transaksi</div><div id="transactionCount" class="value yellow">0</div></div>
+    <div class="card"><div class="label">Prediksi Akhir Bulan</div><div id="prediction" class="value green">Rp0</div></div>
+  </div>
+  <div class="section"><div class="section-title"><h2>Distribusi Pengeluaran</h2></div><div id="chartWrap"><canvas id="categoryChart"></canvas></div></div>
+</section>
+
+<section id="report" class="page">
+  <div class="section">
+    <div class="section-title"><h2>📑 Laporan Keuangan Bulanan</h2><button class="btn" onclick="window.print()">Cetak / Simpan PDF</button></div>
+    <div id="reportContent"></div>
+  </div>
+</section>
+</main>
+</div>
+
+<div class="modal" id="modal">
+<div class="modal-box">
+  <div class="modal-head"><h2 id="modalTitle">Tambah Transaksi</h2><button class="close" onclick="closeModal()">×</button></div>
+  <form onsubmit="addTransaction(event)">
+    <input type="hidden" id="txType">
+    <div class="field"><label>Jumlah (Rp)</label><input id="txAmount" type="number" min="1" required></div>
+    <div class="field" id="catField"><label>Kategori</label><select id="txCategory"><option>Makanan</option><option>Transportasi</option><option>Tagihan</option><option>Pendidikan</option><option>Belanja</option><option>Hiburan</option><option>Kesehatan</option><option>Kebutuhan Pribadi</option><option>Lainnya</option></select></div>
+    <div class="field"><label>Tanggal</label><input id="txDate" type="date" required></div>
+    <div class="field"><label>Catatan</label><input id="txNote" placeholder="Contoh: makan malam"></div>
+    <div class="field" id="sourceField" style="display:none"><label>Sumber Pemasukan</label><input id="txSource" placeholder="Contoh: uang bulanan"></div>
+    <button class="btn">Simpan Transaksi</button>
+  </form>
+</div>
+</div>
+
+<script>
+const rupiah=n=>new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(n||0);
+const today=new Date().toISOString().slice(0,10);
+const key='kostrack_data_v1';
+
+let data=JSON.parse(localStorage.getItem(key)||'null')||{
+ transactions:[
+  {id:1,type:'income',amount:3500000,category:'-',date:today,note:'Uang bulanan',source:'Orang tua'}
+ ],
+ budget:{total:3000000,Makanan:1000000,Transportasi:500000,Tagihan:300000,Pendidikan:250000,Belanja:300000,Hiburan:200000,Kesehatan:150000,Kebutuhan_Pribadi:200000}
+};
+function save(){localStorage.setItem(key,JSON.stringify(data))}
+function expenses(){return data.transactions.filter(x=>x.type==='expense')}
+function incomes(){return data.transactions.filter(x=>x.type==='income')}
+function sum(a){return a.reduce((s,x)=>s+x.amount,0)}
+function fmtDate(d){return new Date(d+'T00:00:00').toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})}
+function daysLeft(){let d=new Date();return new Date(d.getFullYear(),d.getMonth()+1,0).getDate()-d.getDate()+1}
+function currentDayExpenses(){return sum(expenses().filter(x=>x.date===today))}
+function showPage(id,btn){
+ document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');
+ document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');
+ const titles={dashboard:'Dashboard',transactions:'Transaksi',budget:'Budget',statistics:'Statistik',report:'Laporan'};
+ document.getElementById('pageTitle').textContent=titles[id];renderAll();
+}
+function openModal(type){
+ document.getElementById('modal').classList.add('show');document.getElementById('txType').value=type;
+ document.getElementById('modalTitle').textContent=type==='expense'?'Tambah Pengeluaran':'Tambah Pemasukan';
+ document.getElementById('catField').style.display=type==='expense'?'block':'none';
+ document.getElementById('sourceField').style.display=type==='income'?'block':'none';
+ document.getElementById('txDate').value=today;document.getElementById('txAmount').value='';document.getElementById('txNote').value='';
+}
+function closeModal(){document.getElementById('modal').classList.remove('show')}
+function addTransaction(e){
+ e.preventDefault();const type=document.getElementById('txType').value;
+ data.transactions.push({id:Date.now(),type,amount:+document.getElementById('txAmount').value,category:type==='expense'?document.getElementById('txCategory').value:'-',date:document.getElementById('txDate').value,note:document.getElementById('txNote').value,source:document.getElementById('txSource').value});
+ save();closeModal();renderAll();
+}
+function deleteTx(id){if(confirm('Hapus transaksi ini?')){data.transactions=data.transactions.filter(x=>x.id!==id);save();renderAll()}}
+function renderDashboard(){
+ const inc=sum(incomes()),exp=sum(expenses()),bal=inc-exp;
+ document.getElementById('income').textContent=rupiah(inc);document.getElementById('expense').textContent=rupiah(exp);document.getElementById('balance').textContent=rupiah(bal);
+ const daily=Math.max(0,Math.floor(bal/daysLeft()));document.getElementById('dailyBudget').textContent=rupiah(daily);
+ document.getElementById('budgetDayValue').textContent=rupiah(daily);
+ let alerts='';
+ const used=exp/data.budget.total*100;
+ if(used>=100)alerts+='<div class="alert bad">🔴 <b>Budget terlampaui.</b> Pengeluaran sudah '+used.toFixed(0)+'% dari budget bulanan.</div>';
+ else if(used>=80)alerts+='<div class="alert">⚠️ <b>Hampir mencapai budget.</b> Pengeluaran sudah '+used.toFixed(0)+'% dari budget bulanan.</div>';
+ else alerts+='<div class="alert good">🟢 <b>Kondisi aman.</b> Pengeluaran baru '+used.toFixed(0)+'% dari budget bulanan.</div>';
+ const avg=exp/Math.max(1,new Set(expenses().map(x=>x.date)).size);
+ if(avg>daily)alerts+='<div class="alert bad">🚨 Rata-rata pengeluaran per hari lebih tinggi dari budget harian yang aman.</div>';
+ document.getElementById('alerts').innerHTML=alerts;
+ renderBudgetSummary();renderRecent();renderWeekChart();
+ const tip=document.getElementById('tip');
+ const cat=categoryTotals(),top=Object.entries(cat).sort((a,b)=>b[1]-a[1])[0];
+ tip.innerHTML=top?`Pengeluaran terbesar Anda saat ini adalah <b>${top[0]}</b> sebesar <b>${rupiah(top[1])}</b>. Coba tetapkan batas kategori agar pengeluaran lebih terkontrol.`:'Mulai catat pengeluaran pertama Anda untuk mendapatkan tips keuangan yang lebih personal.';
+}
+function renderRecent(){
+ const arr=[...data.transactions].sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id).slice(0,5);
+ document.getElementById('recent').innerHTML=arr.length?`<table><thead><tr><th>Tanggal</th><th>Transaksi</th><th>Nominal</th></tr></thead><tbody>${arr.map(x=>`<tr><td>${fmtDate(x.date)}</td><td>${x.type==='expense'?'💸':'💰'} ${x.note||x.category}</td><td class="${x.type==='expense'?'red':'green'}">${x.type==='expense'?'-':'+'}${rupiah(x.amount)}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">Belum ada transaksi.</div>';
+}
+function renderTransactions(){
+ const q=(document.getElementById('search')?.value||'').toLowerCase(),type=document.getElementById('filterType')?.value||'all',cat=document.getElementById('filterCat')?.value||'all';
+ let arr=data.transactions.filter(x=>(type==='all'||x.type===type)&&(cat==='all'||x.category===cat)&&((x.note||'').toLowerCase().includes(q)||(x.category||'').toLowerCase().includes(q)));
+ arr.sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
+ document.getElementById('transactionTable').innerHTML=arr.length?`<table><thead><tr><th>Tanggal</th><th>Jenis</th><th>Kategori</th><th>Catatan</th><th>Nominal</th><th>Aksi</th></tr></thead><tbody>${arr.map(x=>`<tr><td>${fmtDate(x.date)}</td><td>${x.type==='expense'?'Pengeluaran':'Pemasukan'}</td><td>${x.category==='-'?x.source||'Pemasukan':x.category}</td><td>${x.note||'-'}</td><td class="${x.type==='expense'?'red':'green'}">${x.type==='expense'?'-':'+'}${rupiah(x.amount)}</td><td><button class="btn danger small" onclick="deleteTx(${x.id})">Hapus</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty">Transaksi tidak ditemukan.</div>';
+}
+function categoryTotals(){
+ const o={};expenses().forEach(x=>o[x.category]=(o[x.category]||0)+x.amount);return o;
+}
+function renderBudgetSummary(){
+ const exp=sum(expenses()),total=data.budget.total||1,p=Math.min(100,exp/total*100);
+ document.getElementById('budgetSummary').innerHTML=`<div style="display:flex;justify-content:space-between"><span>Terpakai</span><b>${rupiah(exp)}</b></div><div class="progress ${p>=80?'redbar':''}"><div style="width:${p}%"></div></div><div class="muted">${p.toFixed(0)}% dari ${rupiah(total)}</div>`;
+}
+function renderBudgetDetails(){
+ const cats=Object.keys(data.budget).filter(x=>x!=='total');const totals=categoryTotals();
+ document.getElementById('budgetDetails').innerHTML=cats.map(c=>{let b=data.budget[c]||0,u=totals[c]||0,p=b?u/b*100:0;return `<div style="margin:15px 0"><div style="display:flex;justify-content:space-between"><b>${c.replaceAll('_',' ')}</b><span>${rupiah(u)} / ${rupiah(b)}</span></div><div class="progress ${p>=80?'redbar':''}"><div style="width:${Math.min(100,p)}%"></div></div></div>`}).join('');
+ const daily=currentDayExpenses(),safe=Math.max(0,Math.floor((sum(incomes())-sum(expenses()))/daysLeft()));
+ document.getElementById('dailyStatus').innerHTML=daily>safe?`<div class="alert bad">Hari ini sudah menghabiskan ${rupiah(daily)}. Batas aman saat ini sekitar ${rupiah(safe)}.</div>`:`<div class="alert good">Hari ini ${rupiah(daily)}. Masih dalam batas aman sekitar ${rupiah(safe)}.</div>`;
+}
+function saveBudget(e){
+ e.preventDefault();data.budget.total=+document.getElementById('budgetTotal').value;
+ Object.keys(data.budget).filter(x=>x!=='total').forEach(c=>data.budget[c]=+(document.getElementById('b'+c)?.value||0));
+ save();renderAll();alert('Budget berhasil disimpan.');
+}
+function loadBudgetForm(){document.getElementById('budgetTotal').value=data.budget.total;Object.keys(data.budget).filter(x=>x!=='total').forEach(c=>{let el=document.getElementById('b'+c);if(el)el.value=data.budget[c]})}
+let weekChart,catChart;
+function renderWeekChart(){
+ const labels=[],vals=[];for(let i=6;i>=0;i--){let d=new Date();d.setDate(d.getDate()-i);let s=d.toISOString().slice(0,10);labels.push(d.toLocaleDateString('id-ID',{weekday:'short'}));vals.push(sum(expenses().filter(x=>x.date===s)))}
+ if(weekChart)weekChart.destroy();weekChart=new Chart(document.getElementById('weekChart'),{type:'bar',data:{labels,datasets:[{label:'Pengeluaran',data:vals}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
+}
+function renderStatistics(){
+ const ex=expenses(),avg=sum(ex)/Math.max(1,new Set(ex.map(x=>x.date)).size),cats=categoryTotals(),top=Object.entries(cats).sort((a,b)=>b[1]-a[1])[0],left=daysLeft(),pred=avg*left;
+ document.getElementById('avgExpense').textContent=rupiah(avg);document.getElementById('topCategory').textContent=top?top[0]:'-';document.getElementById('transactionCount').textContent=data.transactions.length;document.getElementById('prediction').textContent=rupiah(pred);
+ if(catChart)catChart.destroy();catChart=new Chart(document.getElementById('categoryChart'),{type:'doughnut',data:{labels:Object.keys(cats),datasets:[{data:Object.values(cats)}]},options:{responsive:true,maintainAspectRatio:false}});
+}
+function renderReport(){
+ const inc=sum(incomes()),exp=sum(expenses()),bal=inc-exp,cats=categoryTotals(),top=Object.entries(cats).sort((a,b)=>b[1]-a[1])[0];
+ document.getElementById('reportContent').innerHTML=`<div class="grid3"><div class="card"><div class="label">Pemasukan</div><div class="kpi green">${rupiah(inc)}</div></div><div class="card"><div class="label">Pengeluaran</div><div class="kpi red">${rupiah(exp)}</div></div><div class="card"><div class="label">Sisa Saldo</div><div class="kpi cyan">${rupiah(bal)}</div></div></div><div style="margin-top:20px"><p><b>Pengeluaran terbesar:</b> ${top?top[0]+' ('+rupiah(top[1])+')':'Belum ada data'}</p><p style="margin-top:10px"><b>Kesimpulan:</b> ${bal>=0?'Saldo masih positif. Pertahankan pencatatan dan gunakan budget harian agar dana cukup sampai akhir bulan.':'Pengeluaran lebih besar daripada pemasukan. Evaluasi kategori pengeluaran terbesar.'}</p></div>`;
+}
+function renderAll(){renderDashboard();renderTransactions();renderBudgetDetails();loadBudgetForm();renderStatistics();renderReport()}
+renderAll();
+</script>
+</body>
+</html>
