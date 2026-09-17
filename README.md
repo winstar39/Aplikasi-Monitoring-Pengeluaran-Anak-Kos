@@ -46,7 +46,7 @@ Solusi yang ditawarkan adalah membangun sebuah **aplikasi monitoring pengeluaran
 Aplikasi dirancang dengan tampilan yang sederhana, modern, responsif, dan mudah digunakan oleh mahasiswa maupun anak kos.
 
 Beberapa fitur yang direncanakan meliputi:
-#🏠 **Dashboard** — menampilkan ringkasan pemasukan, pengeluaran, saldo, dan budget.
+1.  **Dashboard** — menampilkan ringkasan pemasukan, pengeluaran, saldo, dan budget.
 💰 **Pemasukan** — mencatat uang bulanan, gaji, beasiswa, atau pemasukan lainnya.
 💸 **Pengeluaran** — mencatat pengeluaran berdasarkan nominal, kategori, tanggal, dan catatan.
 🏷️ **Kategori Pengeluaran** — mengelompokkan pengeluaran seperti makanan, transportasi, tagihan, pendidikan, dan hiburan.
