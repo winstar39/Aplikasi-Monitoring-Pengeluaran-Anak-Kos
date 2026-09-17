@@ -46,17 +46,17 @@ Solusi yang ditawarkan adalah membangun sebuah **aplikasi monitoring pengeluaran
 Aplikasi dirancang dengan tampilan yang sederhana, modern, responsif, dan mudah digunakan oleh mahasiswa maupun anak kos.
 
 Beberapa fitur yang direncanakan meliputi:
-1.  **Dashboard** — menampilkan ringkasan pemasukan, pengeluaran, saldo, dan budget.
-💰 **Pemasukan** — mencatat uang bulanan, gaji, beasiswa, atau pemasukan lainnya.
-💸 **Pengeluaran** — mencatat pengeluaran berdasarkan nominal, kategori, tanggal, dan catatan.
-🏷️ **Kategori Pengeluaran** — mengelompokkan pengeluaran seperti makanan, transportasi, tagihan, pendidikan, dan hiburan.
-🎯 **Budget** — menentukan batas pengeluaran dalam satu bulan.
-📅 **Budget Harian** — membantu mengetahui batas pengeluaran harian berdasarkan kondisi keuangan.
-📊 **Statistik** — menampilkan grafik dan informasi mengenai pengeluaran berdasarkan kategori.
-🚨 **Peringatan Budget** — memberikan informasi ketika pengeluaran mendekati atau melewati batas budget.
-🔍 **Riwayat Transaksi** — menampilkan daftar pemasukan dan pengeluaran yang telah dicatat.
-📑 **Laporan** — menampilkan ringkasan kondisi keuangan dalam satu periode.
-🔮 **Prediksi Sederhana** — memperkirakan pengeluaran berdasarkan pola pengeluaran yang telah dicatat.
+1. **Dashboard** — menampilkan ringkasan pemasukan, pengeluaran, saldo, dan budget.
+2. **Pemasukan** — mencatat uang bulanan, gaji, beasiswa, atau pemasukan lainnya.
+3. **Pengeluaran** — mencatat pengeluaran berdasarkan nominal, kategori, tanggal, dan catatan.
+4. **Kategori Pengeluaran** — mengelompokkan pengeluaran seperti makanan, transportasi, tagihan, pendidikan, dan hiburan.
+5. **Budget** — menentukan batas pengeluaran dalam satu bulan.
+6. **Budget Harian** — membantu mengetahui batas pengeluaran harian berdasarkan kondisi keuangan.
+7. **Statistik** — menampilkan grafik dan informasi mengenai pengeluaran berdasarkan kategori.
+8. **Peringatan Budget** — memberikan informasi ketika pengeluaran mendekati atau melewati batas budget.
+9. **Riwayat Transaksi** — menampilkan daftar pemasukan dan pengeluaran yang telah dicatat.
+10. **Laporan** — menampilkan ringkasan kondisi keuangan dalam satu periode.
+11. **Prediksi Sederhana** — memperkirakan pengeluaran berdasarkan pola pengeluaran yang telah dicatat.
 
 
 🎯 Tujuan Proyek
