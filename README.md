@@ -139,29 +139,6 @@ Ruang lingkup proyek meliputi:
 * Dokumentasi proses pengembangan.
 
 
-🚫 Fitur yang Tidak Dikerjakan
-
-Untuk menjaga ruang lingkup agar tetap realistis dan dapat diselesaikan dalam **12 pertemuan**, beberapa fitur tidak termasuk dalam pengembangan tahap awal.
-
-Fitur tersebut antara lain:
-
-* Sistem perbankan.
-* Integrasi rekening bank.
-* Integrasi e-wallet seperti GoPay, DANA, OVO, dan ShopeePay.
-* Transfer uang.
-* Pembayaran tagihan secara langsung.
-* Sistem investasi.
-* Sistem pinjaman atau kredit.
-* OCR untuk membaca struk belanja.
-* AI chatbot keuangan.
-* Integrasi WhatsApp.
-* Integrasi GPS atau lokasi.
-* Sistem multi-user keluarga.
-* Integrasi dengan aplikasi keuangan pihak ketiga.
-
-Fitur-fitur tersebut dapat dipertimbangkan sebagai pengembangan pada tahap selanjutnya.
-
-
  📈 Pengembangan Selanjutnya
 
 Aplikasi KosTrack dirancang agar dapat dikembangkan menjadi sistem monitoring keuangan yang lebih kompleks apabila dibutuhkan.
